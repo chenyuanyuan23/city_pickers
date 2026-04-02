@@ -1,9 +1,7 @@
 //
 // Created with Android Studio.
-// User: 三帆
 // Date: 12/02/2019
 // Time: 18:06
-// email: sanfan.hx@alibaba-inc.com
 // tartget:  xxx
 //
 

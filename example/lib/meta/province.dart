@@ -1,9 +1,7 @@
 //
 // Created with Android Studio.
-// User: 三帆
 // Date: 26/02/2019
 // Time: 19:34
-// email: sanfan.hx@alibaba-inc.com
 // target:  自定义数据源
 //
 const Map<String, String> provincesData = {

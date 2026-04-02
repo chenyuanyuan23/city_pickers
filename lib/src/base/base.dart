@@ -1,8 +1,3 @@
-// Created with Android Studio.
-// User: 三帆
-// Date: 28/01/2019
-// Time: 18:20
-// email: sanfan.hx@alibaba-inc.com
 import 'dart:async';
 
 import 'package:city_pickers/modal/base_citys.dart';

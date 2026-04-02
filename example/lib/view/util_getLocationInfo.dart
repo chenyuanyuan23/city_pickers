@@ -1,9 +1,7 @@
 //
 // Created with Android Studio.
-// User: 三帆
 // Date: 09/05/2019
 // Time: 20:08
-// email: sanfan.hx@alibaba-inc.com
 // tartget:  xxx
 //
 import 'package:flutter/material.dart';
