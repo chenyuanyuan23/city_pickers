@@ -1,97 +1,42 @@
-//
-// Created with Android Studio.
-// User: 三帆
-// Date: 21/02/2019
-// Time: 10:37
-// email: sanfan.hx@alibaba-inc.com
-// tartget:  xxx
-//
-
-import 'package:collection/collection.dart';
-import 'package:lpinyin/lpinyin.dart';
-
 import '../../modal/base_citys.dart';
 import '../../modal/point.dart';
 
-class CitiesSearcher {
-  final List<Point> _cities;
-  CitiesSearcher(this._cities);
+// 城市列表偏移量结构
+class CityOffsetRange {
+  double? start;
+  double? end;
+  String? tag;
 
-  String _prevQuery = '';
-  late List<Point> _prevQueryResult = _cities;
+  CityOffsetRange({this.start, this.end, this.tag});
+}
 
-  List<Point> search(String text) {
-    final query = text.trim().toLowerCase();
-    if (query == _prevQuery) {
-      // 查询条件相同, 结果相同
-      return _prevQueryResult;
-    }
+class TagCount {
+  int? count;
+  String? letter;
 
-    final cities = query.startsWith(_prevQuery)
-        // 查询条件范围变窄, 可以直接在上次的查询结果基础上过滤
-        ? _prevQueryResult
-        : _cities;
-
-    final result = <Point>[];
-    final queryPinyin = ChineseHelper.containsChinese(query)
-        ? null
-        : query.replaceAll(RegExp(r'\s'), '');
-
-    for (final city in cities) {
-      if (queryPinyin != null) {
-        final pinyin = city.pinyin;
-        if (pinyin != null) {
-          if (pinyin.short.startsWith(queryPinyin) ||
-              pinyin.full.startsWith(queryPinyin)) {
-            result.add(city);
-            continue;
-          }
-        }
-      }
-      if ((city.letter?.toLowerCase().startsWith(query) == true) ||
-          city.lowerCaseName.contains(query)) {
-        result.add(city);
-      }
-    }
-    return result;
-  }
+  TagCount({this.count, this.letter});
 }
 
 class CitiesUtils {
   /// 获取城市选择器所有的数据
   static List<Point> getAllCitiesByMeta(
-    Map<String, String> provinceMeta,
-    Map<String, dynamic> citiesMeta,
-  ) {
-    CityTree citiesTreeBuilder = new CityTree(
-      metaInfo: citiesMeta,
-      provincesInfo: provinceMeta,
-    );
-
-    final provinces = provinceMeta.keys
-        .map((provinceId) => citiesTreeBuilder.initTree(provinceId))
-        .toList();
-
+      Map<String, String> provinceMeta, Map<String, dynamic> citiesMeta) {
+    List<Point> trees = [];
     List<Point> cities = [];
-    for (final province in provinces) {
-      for (final city in province.children) {
-        if (city.isClassificationNode) {
-          // city级的"分类节点", 下面是"省直辖县级行政区", 这里也把他们看作是一个city
-          cities.addAll(city.children);
-        } else {
-          cities.add(city);
-        }
-      }
+    CityTree citiesTreeBuilder =
+        CityTree(metaInfo: citiesMeta, provincesInfo: provinceMeta);
+    for (var entry in provinceMeta.entries) {
+      trees.add(citiesTreeBuilder.initTree(int.parse(entry.key))!);
     }
-    // 归并排序, 结果稳定
-    mergeSort<Point>(
-      cities,
-      compare: (p0, p1) {
-        final c0 = p0.letter!.codeUnitAt(0);
-        final c1 = p1.letter!.codeUnitAt(0);
-        return c0.compareTo(c1);
-      },
-    );
+    for (Point tree in trees) {
+      cities.addAll(tree.child);
+    }
+    cities.sort((Point a, Point b) {
+      return a.letter!.codeUnitAt(0) - b.letter!.codeUnitAt(0);
+    });
+    for (Point point in cities) {
+      point.letter = point.letter!.toUpperCase();
+    }
     return cities;
   }
 
@@ -100,21 +45,51 @@ class CitiesUtils {
 
     /// 先分类
     String lastTag = '';
-    citiesList.forEach((Point item) {
+    for (Point item in citiesList) {
       if (item.letter != lastTag) {
         validTags.add(item.letter!);
         lastTag = item.letter!;
       }
-    });
+    }
     return validTags;
+  }
+
+  static List<CityOffsetRange> getOffsetRangeByCitiesList(
+      {required List<Point>? lists,
+      required double? itemHeight,
+      required double? tagHeight}) {
+    List<TagCount> categoriesList = [];
+    List<CityOffsetRange> result = [];
+
+    /// 先分类
+    String lastTag = '';
+    for (Point item in lists!) {
+      if (item.letter != lastTag) {
+        categoriesList.add(TagCount(letter: item.letter, count: 0));
+        lastTag = item.letter!;
+      }
+    }
+    for (Point item in lists) {
+      TagCount target = categoriesList.firstWhere((TagCount tagCount) {
+        return tagCount.letter == item.letter;
+      });
+      target.count = target.count! + 1;
+    }
+    for (TagCount item in categoriesList) {
+      double? start = result.isNotEmpty ? result.last.end : 0;
+      result.add(CityOffsetRange(
+          start: start,
+          end: start! + item.count! * itemHeight! + tagHeight!,
+          tag: item.letter!.toUpperCase()));
+    }
+    return result;
   }
 }
 
-/// 热闹城市对象
+// 热闹城市对象
 class HotCity {
-  final String name;
-  final String id;
+  final String? name;
+  final int? id;
   final String tag;
-
-  HotCity({required this.name, required this.id, this.tag = "★"});
+  const HotCity({required this.name, required this.id, this.tag = "★"});
 }

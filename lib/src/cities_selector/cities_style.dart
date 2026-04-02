@@ -2,31 +2,28 @@ import 'package:flutter/material.dart';
 
 // 公共的基本样式
 class BaseStyle {
-  double fontSize;
-  Color color;
+  double? fontSize;
+  Color? color;
   Color? activeColor;
   Color? backgroundColor;
   double? height;
   Color? backgroundActiveColor;
 
-  BaseStyle({
-    required this.color,
-    required this.fontSize,
-    this.height,
-    this.activeColor,
-    this.backgroundActiveColor,
-    this.backgroundColor,
-  });
+  BaseStyle(
+      {this.color,
+      this.fontSize,
+      this.height,
+      this.activeColor,
+      this.backgroundActiveColor,
+      this.backgroundColor});
 
-  BaseStyle copyWith({
-    double? fontSize,
-    Color? color,
-    double? height,
-    Color? activeColor,
-    Color? backgroundColor,
-    Color? backgroundActiveColor,
-  }) {
-//    print("copyWidth >>> fontSize: ${fontSize ?? this.fontSize}");
+  BaseStyle copyWith(
+      {double? fontSize,
+      Color? color,
+      double? height,
+      Color? activeColor,
+      Color? backgroundColor,
+      Color? backgroundActiveColor}) {
     return BaseStyle(
         fontSize: fontSize ?? this.fontSize,
         color: color ?? this.color,
@@ -37,8 +34,7 @@ class BaseStyle {
             backgroundActiveColor ?? this.backgroundActiveColor);
   }
 
-  BaseStyle merge(BaseStyle? other) {
-    if (other == null) return this;
+  BaseStyle merge(BaseStyle other) {
     return copyWith(
         fontSize: other.fontSize,
         color: other.color,

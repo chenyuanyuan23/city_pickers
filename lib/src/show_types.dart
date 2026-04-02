@@ -1,9 +1,8 @@
 // 显示类型
 enum Mods {
-  Province,
-  Area,
-  City,
-  Village, // 增加第4级(村/镇)选择
+  province,
+  area,
+  city,
 }
 
 abstract class ShowTypeGeometry {
@@ -15,17 +14,12 @@ class ShowType extends ShowTypeGeometry {
 
   const ShowType(this.typesList);
 
-  static const ShowType p = ShowType([Mods.Province]);
-  static const ShowType c = ShowType([Mods.City]);
-  static const ShowType a = ShowType([Mods.Area]);
-  static const ShowType v = ShowType([Mods.Village]); // 增加第4级(村/镇)选择
-  static const ShowType pc = ShowType([Mods.Province, Mods.City]);
-  static const ShowType pca = ShowType([Mods.Province, Mods.City, Mods.Area]);
-  static const ShowType pcav = ShowType(
-      [Mods.Province, Mods.City, Mods.Area, Mods.Village]); // 增加第4级(村/镇)选择
-  static const ShowType ca = ShowType([Mods.Area, Mods.City]);
-  static const ShowType cav =
-      ShowType([Mods.Area, Mods.City, Mods.Village]); // 增加第4级(村/镇)选择
+  static const ShowType p = ShowType([Mods.province]);
+  static const ShowType c = ShowType([Mods.city]);
+  static const ShowType a = ShowType([Mods.area]);
+  static const ShowType pc = ShowType([Mods.province, Mods.city]);
+  static const ShowType pca = ShowType([Mods.province, Mods.city, Mods.area]);
+  static const ShowType ca = ShowType([Mods.area, Mods.city]);
 
   ShowType operator +(ShowType others) {
     typesList.addAll(others.typesList);

@@ -1,0 +1,5 @@
+
+linter:
+  rules:
+    flutter_style_todos: true
+    depend_on_referenced_packages: false

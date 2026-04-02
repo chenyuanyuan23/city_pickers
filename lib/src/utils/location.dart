@@ -1,17 +1,11 @@
-//
-// Created with Android Studio.
-// User: 三帆
-// Date: 09/05/2019
-// Time: 15:47
-// email: sanfan.hx@alibaba-inc.com
-// target:  处理locationCode相关
-//
-import '../../modal/result.dart';
-import '../../modal/point.dart';
+import 'package:flutter/foundation.dart';
+
 import '../../modal/base_citys.dart';
+import '../../modal/point.dart';
+import '../../modal/result.dart';
 
 class Location {
-  Map<String, dynamic> citiesData;
+  Map<String, dynamic>? citiesData;
 
   Map<String, String>? provincesData;
 
@@ -24,50 +18,48 @@ class Location {
   /// the target area user selected
   Point? areaPoint;
 
-  // standby
-  // Point village;
-
   // 没有一次性构建整个以国为根的树. 动态的构建以省为根的树, 效率高.
-  // List<Point> provinces;
+  List<Point>? provinces;
 
-  Location({required this.citiesData, required this.provincesData});
+  Location({this.citiesData, this.provincesData});
 
-  Result initLocation(String _locationCode) {
-//    print("initLocation >>>> $_locationCode");
-
+  Result initLocation(String? locationCode) {
     CityTree cityTree =
-        new CityTree(metaInfo: citiesData, provincesInfo: provincesData);
+        CityTree(metaInfo: citiesData!, provincesInfo: provincesData!);
 
-    String locationCode;
-    Result locationInfo = new Result();
-    try {
-      locationCode = _locationCode;
-    } catch (e) {
-      print(ArgumentError(
-          "The Argument locationCode must be valid like: '100000' but get '$_locationCode' "));
-      return locationInfo;
+    int? locationCodeInt;
+    Result locationInfo = Result();
+    if (locationCode != null) {
+      try {
+        locationCodeInt = int.parse(locationCode);
+      } catch (e) {
+        debugPrint(ArgumentError(
+                "The Argument locationCode must be valid like: '100000' but get '$locationCode' ")
+            .toString());
+        return locationInfo;
+      }
     }
-    provincePoint = cityTree.initTreeByCode(locationCode);
+    provincePoint = cityTree.initTreeByCode(locationCodeInt!);
 
-    if (provincePoint?.isNull ?? true) {
+    if (provincePoint == null || provincePoint!.isNull) {
       return locationInfo;
     }
     locationInfo.provinceName = provincePoint!.name;
     locationInfo.provinceId = provincePoint!.code.toString();
 
-    provincePoint!.children.forEach((Point _city) {
-      if (_city.code == locationCode) {
-        cityPoint = _city;
+    for (Point city in provincePoint!.child) {
+      if (city.code == locationCodeInt) {
+        cityPoint = city;
       }
 
       /// 正常不应该在一个循环中, 如此操作, 但是考虑到地区码的唯一性, 可以在一次双层循环中完成操作. 避免第二层的循环查找
-      _city.children.forEach((Point _area) {
-        if (_area.code == locationCode) {
-          cityPoint = _city;
-          areaPoint = _area;
+      for (Point area in city.child) {
+        if (area.code == locationCodeInt) {
+          cityPoint = city;
+          areaPoint = area;
         }
-      });
-    });
+      }
+    }
 
     if (cityPoint != null && !cityPoint!.isNull) {
       locationInfo.cityName = cityPoint!.name;

@@ -1,16 +1,9 @@
-//
-// Created with Android Studio.
-// User: 三帆
-// Date: 28/01/2019
-// Time: 21:38
-// email: sanfan.hx@alibaba-inc.com
-// target: 组件内部使用的工具方法
 import 'package:flutter/material.dart';
 import 'dart:async';
 
 /// it's a cache class, aim to reduce calculations;
 class Cache {
-  Map<String, dynamic> _cache = {};
+  final Map<String, dynamic> _cache = {};
 
   // factory
   factory Cache() {
@@ -45,21 +38,14 @@ class Cache {
   }
 
   static Cache _getInstance() {
-    if (_instance == null) {
-      _instance = new Cache._();
-    }
+    _instance ??= Cache._();
     return _instance!;
   }
 }
 
-void setTimeout({required int milliseconds, callback = VoidCallback}) {
-  new Timer(Duration(milliseconds: milliseconds), () {
-    callback();
-  });
+void setTimeout({required int milliseconds, required VoidCallback callback}) {
+  Timer(Duration(milliseconds: milliseconds), callback);
 }
 
 typedef ItemWidgetBuilder = Widget Function(
     dynamic item, List<dynamic> list, int index);
-
-/// 自定义 城市选择器的头
-typedef AppBarBuilder = AppBar Function(String title);
